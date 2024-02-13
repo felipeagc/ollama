@@ -75,3 +75,13 @@ if [ -z "${OLLAMA_SKIP_MANIFEST_CREATE}" ]; then
         echo "  ${ARCH_IMAGE_REPO}:$VERSION-rocm"
     fi
 fi
+
+docker build \
+    --load \
+    --platform=linux/amd64 \
+    --build-arg=VERSION \
+    --build-arg=GOFLAGS \
+    --target runtime-oneapi \
+    -f Dockerfile \
+    -t ollama/ollama:$VERSION-oneapi \
+    .
