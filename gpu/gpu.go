@@ -143,11 +143,6 @@ func GetGPUInfo() GpuInfo {
 				slog.Info(fmt.Sprintf("CUDA GPU is too old. Falling back to CPU mode. Compute Capability detected: %d.%d", cc.major, cc.minor))
 			}
 		}
-	} else {
-		AMDGetGPUInfo(&resp)
-		if resp.Library != "" {
-			return resp
-		}
 	} else if gpuHandles.oneapi != nil && (cpuVariant != "" || runtime.GOARCH != "amd64") {
 		C.oneapi_check_vram(*gpuHandles.oneapi, &memInfo)
 		if memInfo.err != nil {
@@ -170,7 +165,12 @@ func GetGPUInfo() GpuInfo {
 			}
 			resp.Library = "oneapi"
 		}
-	}
+	} else {
+		AMDGetGPUInfo(&resp)
+		if resp.Library != "" {
+			return resp
+		}
+	} 
 	if resp.Library == "" {
 		C.cpu_check_ram(&memInfo)
 		resp.Library = "cpu"
